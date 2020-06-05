@@ -1,4 +1,4 @@
-# Topic-Discriminative word representations
+# Robust Topic-Discriminative word representations
 
 ### Introduction
 
