@@ -1,4 +1,4 @@
-# BOCE: Topic-Discriminative word embeddings
+# Topic-Discriminative word representations
 
 ### Introduction
 
