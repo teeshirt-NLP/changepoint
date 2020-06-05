@@ -8,7 +8,7 @@ To reproduce the results, see the evaluation script
 
 
 ### How to run the trained model:
-1) Use 7-zip (or similar) to decompress the files in [Trained_model/](https://github.com/osotsia/BOCE-embeddings/tree/master/Trained_model)
+1) Use 7-zip (or similar) to decompress the files in [Trained_model/](https://github.com/teeshirt-NLP/changepoint/tree/master/Trained_model)
 2) Read in the resulting file containing the 100-dimensional embeddings over 400K words. See the evaluation scripts for helpful R functions.
 
 
