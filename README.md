@@ -13,7 +13,7 @@ To reproduce the results, see the evaluation script
 
 
 ### How to train your own embeddings:
-1) [Download](https://en.wikipedia.org/wiki/Wikipedia:Database_download) Wikipedia then extract it using ```bzip2 -dk enwiki-YOURDATE-pages-articles.xml.bz2```
+1) Download [Wikipedia](https://meta.wikimedia.org/wiki/Data_dump_torrents#English_Wikipedia) then extract it using ```bzip2 -dk enwiki-YOURDATE-pages-articles.xml.bz2```
 
 2) Run the [training scripts](https://github.com/teeshirt-NLP/changepoint/tree/master/Scripts) to create the training and testing datasets. Note: this may take up to 100GB memory and approx 5hrs.
 
@@ -24,9 +24,10 @@ To reproduce the results, see the evaluation script
 
 3) Install tensorflow==1.14 tensorflow-probability==0.7.0, then run [3train.py](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/3train.py)
 
-🔶 Note: Read through the scripts to change path and file names where appropriate.
 
 ### Results
+🔶 Note: Read through the evaluation script to change path and file names where appropriate.
+
 
 
 
