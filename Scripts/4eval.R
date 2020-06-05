@@ -22,8 +22,8 @@ bocevocabpath = "/path/to/BOCE.English.400K.vocab.txt"
 
 #This is for Step 3.
 #Downlod wikipedia and follow the README instructions to create the train/test pkl files (Note:this is time consuming)
-#Within python, load and convert the Wiki test data to csv as follows
 
+#load and convert the Wiki test data to csv using the following PYTHON code
 {
   #import pickle
   #def save_obj(obj, name ):
