@@ -24,7 +24,7 @@ To reproduce the results, see the evaluation script
 
 3) Install tensorflow==1.14 tensorflow-probability==0.7.0, then run [3train.py](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/3train.py)
 
-🔶 Note: Read through the scripts to change path and file names particularly for the evaluation, as it requires downloading GloVe vectors.
+🔶 Note: Read through the scripts to change path and file names where appropriate.
 
 ### Results
 
