@@ -39,7 +39,7 @@ To reproduce the results, see the evaluation script
 
 ![text](https://github.com/teeshirt-NLP/changepoint/blob/master/noiseresults.png)
 
-#### Bert results
+#### BERT results
 
 
 ### References
