@@ -28,7 +28,7 @@ To reproduce the results, see the evaluation script
 ### How to run the evaluations
 🔶 Note: Read through the evaluation script to change path and file names where appropriate.
 
-1) Download the trained model and step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
+1) Download the trained model, process Wikipedia as described above to get the test set, and step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
 
 
 
