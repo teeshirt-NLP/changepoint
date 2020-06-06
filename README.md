@@ -31,6 +31,14 @@ To reproduce the results, see the evaluation script
 1) Download the trained model, process Wikipedia as described above to get the test set, and step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
 
 
+### Embedding results
+|  | Our method | GloVe |
+| --- | --- | --- |
+| Median(IQR) correlations | 0.0070 (0.186) |0.109 (0.133) |
+| Median(IQR) modularity | 0.306 (0.077) | 0.129 (0.033)  |
+
+### Bert results
+
 
 ### References
 [1] Paper awaiting review
