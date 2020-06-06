@@ -37,6 +37,7 @@ To reproduce the results, see the evaluation script
 | Median(IQR) correlations (lower is better) | 0.0070 (0.186) |0.109 (0.133) |
 | Median(IQR) modularity (higher is better) | 0.306 (0.077) | 0.129 (0.033)  |
 
+![text](https://github.com/teeshirt-NLP/changepoint/blob/master/noiseresults.png)
 
 #### Bert results
 
