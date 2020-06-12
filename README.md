@@ -26,25 +26,21 @@ To reproduce the results, see the evaluation script
 
 
 ### How to run the evaluations
-🔶 Note: Read through the evaluation script to change path and file names where appropriate.
+🔶  Note: Read through the evaluation script to change path and file names where appropriate.
 
 1) Download the trained model and process Wikipedia as described above to get the test set
 
 
-2) Step through the embedding [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
+2) Step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
 
-3) Step through the BERT evaluation script.
 
 ### Results
-#### Embedding results
 |  | Our method | GloVe |
 | --- | --- | --- |
 | Median(IQR) correlations (lower is better) | 0.0070 (0.186) |0.109 (0.133) |
 | Median(IQR) modularity (higher is better) | 0.306 (0.077) | 0.129 (0.033)  |
 
 ![text](https://github.com/teeshirt-NLP/changepoint/blob/master/noiseresults.png)
-
-#### BERT results
 
 
 ### References
