@@ -30,17 +30,19 @@ To reproduce the results, see the evaluation script
 
 1) Download the trained model and eval/wikitestdata.csv.zip
 
-
 2) Step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
 
 
 ### Results
+#### Unsupervised evaluation (correlation and modularity)
+
 |  | Our method | GloVe |
 | --- | --- | --- |
 | Median(IQR) correlations (lower is better) | 0.0070 (0.186) |0.109 (0.133) |
 | Median(IQR) modularity (higher is better) | 0.306 (0.077) | 0.129 (0.033)  |
 
-Below: test set accuracy (higher slope is better)
+
+#### Supervised evaluation: test set accuracy (higher slope is better)
 
 ![text](https://github.com/teeshirt-NLP/changepoint/blob/master/noiseresults.png)
 
