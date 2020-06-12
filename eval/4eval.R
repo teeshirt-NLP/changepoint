@@ -6,10 +6,30 @@
 #2. Run pairwise correlations
 #3. load Wiki test set and calculate modularities
 #4. load AG news and run text classification example
+#4b. BERT classification analysis
 
 
+installAndLoad <- Vectorize(function(...) { #Better installing packages
+  loaded <- suppressWarnings(require(..., warn.conflicts = FALSE, quietly=TRUE))
+  if(!loaded) {
+    install.packages(...,repos = "http://cran.us.r-project.org")
+    loaded <- require(..., warn.conflicts = FALSE, quietly=TRUE)
+  }
+  invisible(loaded)
+})
+installAndLoad("caret")
+installAndLoad("randomForest")
+installAndLoad("tm")
+installAndLoad("quanteda")
+installAndLoad("lattice") 
+installAndLoad("igraph")
+
+
+ncores = 10
 #TODO: convert to rmarkdown
-#--------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------------------------------------
 #Step 0: Set up the following environment
 
 #Download and unzip GloVe vectors - https://nlp.stanford.edu/projects/glove/
@@ -21,8 +41,13 @@ bocevocabpath = "/path/to/BOCE.English.400K.vocab.txt"
 
 
 #This is for Step 3.
-#Downlod wikipedia and follow the README instructions to create the train/test pkl files (Note:this is time consuming)
+#Download wikitestdata.zip and extract wikitestdata.csv
+wikitestfilepath = "/path/to/wikitestdata.csv"
 
+# OR
+
+#******
+#Downlod wikipedia and follow the README instructions to create the train/test pkl files (Note:this is time consuming)
 #load and convert the Wiki test data to csv using the following PYTHON code
 {
   #import pickle
@@ -41,11 +66,12 @@ bocevocabpath = "/path/to/BOCE.English.400K.vocab.txt"
   #  wr = csv.writer(f, delimiter='|')
   #  wr.writerows(testdata)
 }
+#******
 
-wikitestfilepath = "/path/to/testdata.csv"
 
 
-#--------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------------
 
 ## Step 1. load GloVe vectors
 
@@ -114,15 +140,6 @@ BOCE.100 <- proc_pretrained_vec(BOCEfile, BOCEvocab)
 
 
 #Test encoding data
-
-installAndLoad <- Vectorize(function(...) { #Better installing packages
-  loaded <- suppressWarnings(require(..., warn.conflicts = FALSE, quietly=TRUE))
-  if(!loaded) {
-    install.packages(...,repos = "http://cran.us.r-project.org")
-    loaded <- require(..., warn.conflicts = FALSE, quietly=TRUE)
-  }
-  invisible(loaded)
-})
 
 
 encodetextdata <- function(rawdata, wordvectors){
@@ -209,6 +226,8 @@ save(BOCE.100, file = "BOCE.100.rData")
 save(glove.300, file = "glove.6B.300d.rData")
 
 
+
+y1 = fitwithS4(encodedboce$etm)
 #-----------------------------------------------------------------------------------------------------------
 #Step 2. Pairwise correlations
 
@@ -356,9 +375,8 @@ apply(s, MARGIN = 2, FUN = "median") #BOCE modularity is higher
 
 
 #-----------------------------------------------------------------------------------------------------------
-#3. Classification on AG news
-installAndLoad("caret")
-installAndLoad("randomForest")
+#4. Classification on AG news
+
 
 #Download and unzip AG's news corpus: http://groups.di.unipi.it/~gulli/AG_corpus_of_news_articles.html
 
@@ -366,7 +384,7 @@ installAndLoad("randomForest")
 AGfilepath = "/path/to/newsspace200.xml"
 library(XML)
 result <- xmlParse(file = AGfilepath)
-xml_data <- xmlToList(result) 
+xml_data <- xmlToList(result)  #This is time consuming
 
 
 #The above is time consuming, so save the intermediate result
@@ -383,7 +401,7 @@ load("xml_data.rData")
 
 rawAGdata = c()
 ydata = c()
-n= 2200# we eventually want 2000 in train and 200 in test
+n= 3200# we eventually want 2000 in train and 200 in test
 i=0
 while(TRUE){
   #xml data arranged as 8*i +offset
@@ -416,8 +434,19 @@ ydata = as.factor(ydata)
 
 
 #Create training/test split
-splitindexes = sample(1:length(rawAGdata), 200, replace = FALSE)
+#splitindexes = sample(1:length(rawAGdata), 200, replace = FALSE)
+splitindexes = c(66, 553, 1731, 1331, 138, 1651, 2142, 668, 219, 551, 350, 1036, 271, 1496, 2061, 405, 335, 1886, 1572, 1793, 559,
+                 79, 2126, 1335, 2111, 891, 816, 389, 883, 429, 1962, 25, 430, 144, 410, 1407, 480, 1276, 639, 97, 4, 464,
+                 454, 167, 546, 475, 236, 1609, 704, 373, 339, 961, 448, 941, 679, 1355, 1597, 1911, 625, 846, 1432, 1738, 460,
+                 882, 435, 712, 2075, 426, 534, 1396, 806, 268, 1873, 1088, 934, 691, 1243, 2169, 1384, 1959, 1392, 158, 688, 764,
+                 1435, 702, 492, 951, 1516, 824, 1903, 2101, 1841, 1734, 1807, 1272, 391, 1222, 1865, 1866, 525, 1796, 2127, 991, 495,
+                 1759, 1659, 409, 893, 932, 1644, 1032, 706, 83, 1520, 1994, 479, 1521, 28, 428, 2071, 181, 1571, 1430, 1263, 1144,
+                 1138, 570, 1529, 2110, 1422, 202, 1312, 1490, 763, 1757, 2130, 518, 637, 290, 775, 1779, 933, 94, 998, 1227, 193,
+                 2103, 1613, 1628, 1071, 1939, 258, 1606, 1704, 635, 1670, 822, 790, 440, 1524, 676, 1657, 281, 1546, 871, 1342, 1527,
+                 1286, 1482, 1896, 535, 876, 1949, 1311, 38, 1121, 227, 163, 1074, 833, 89, 1023, 172, 1089, 473, 111, 136, 1954,
+                 2076, 1173, 212, 477, 337, 1084, 2161, 992, 1607, 1512, 778)
 
+smallrange = c(0,10,20,30,40,50,60,70,80,90,99)+1
 
 
 encodetextdata <- function(rawdata, wordvectors, splitindexes=NULL, ydata=NULL){
@@ -481,7 +510,6 @@ encodetextdata <- function(rawdata, wordvectors, splitindexes=NULL, ydata=NULL){
     themetric = "Accuracy"
     control <- trainControl(method="repeatedcv", number=10, repeats=3, savePredictions=TRUE,  classProbs=TRUE)
     thentree = 500
-    ncores = 10
     
     #split
     testx = etm[splitindexes, ]
@@ -508,21 +536,18 @@ encodetextdata <- function(rawdata, wordvectors, splitindexes=NULL, ydata=NULL){
 }
 
 
-calcrandomnoise <- function(outputmat, fit1, testy, rawdata, splitindexes){
+calcrandomnoiseEmbed <- function(outputmat, fit1, testy, rawdata, splitindexes){
   nresults = c()
-  for(nwords in 1:100){
-    if(nwords %% 10 ==0)
-      print(nwords)
+  for(nwords in smallrange){
+    print(nwords)
     
     testrawdata = rawdata[splitindexes]
     
     for(i in 1:length(testrawdata)){
       newwords = sample(colnames(outputmat), nwords)
       
-      testrawdata[i] = paste(c(testrawdata[i], newwords), collapse = " ")
+      testrawdata[i] = paste(c(testrawdata[i], newwords), collapse = " ") #embeddings don't care about word order
     }
-    
-    
     
     dv = encodetextdata(testrawdata, outputmat)
     testxnoise = dv$etm
@@ -537,22 +562,127 @@ calcrandomnoise <- function(outputmat, fit1, testy, rawdata, splitindexes){
 }
 
 
-
-
 BOCEdata = encodetextdata(rawAGdata, BOCE.100, splitindexes, ydata)
-BOCEnoiseresults = calcrandomnoise(BOCE.100, BOCEdata$fit1, BOCEdata$testy, rawAGdata, splitindexes)
+BOCEnoiseresults = calcrandomnoiseEmbed(BOCE.100, BOCEdata$fit1, BOCEdata$testy, rawAGdata, splitindexes)
 
 Glovedata = encodetextdata(rawAGdata, glove.300, splitindexes, ydata)
-Glovenoiseresults = calcrandomnoise(glove.300, Glovedata$fit1, Glovedata$testy, rawAGdata, splitindexes)
+Glovenoiseresults = calcrandomnoiseEmbed(glove.300, Glovedata$fit1, Glovedata$testy, rawAGdata, splitindexes)
 
 
 
-plot(Glovenoiseresults, ylab = "Test set accuracy", xlab = "Number of added noise words", ylim = c(0.35,1), type = "l", col="orange", cex.lab=1.5)
-lines(BOCEnoiseresults, col="blue")
+plot(x=smallrange, y=Glovenoiseresults[smallrange], ylab = "Test set accuracy", xlab = "Number of added noise words", ylim = c(0.25,1), type = "l", col="orange", cex.lab=1.5)
+lines(x=smallrange, y=BOCEnoiseresults[smallrange], col="blue")
 
-legend("topright", legend=c("BOCE", "GloVe"),
+legend("topright", legend=c("Our method", "GloVe"),
        col=c("blue", "orange"), lty=1, lwd = 3, cex=1)
 
 
+
+
+#--------------------
+
+#4b. BERT classification analysis (run the previous Section 4 first)
+
+
+#Write unmodified data, for training
+write.table(rawAGdata[-splitindexes], file = "xtrain", quote = FALSE, col.names = FALSE, row.names = FALSE)
+write.table(as.numeric(ydata[-splitindexes])-1, file = "ytrain", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+write.table(rawAGdata[splitindexes], file = "xtest", quote = FALSE, col.names = FALSE, row.names = FALSE)
+write.table(as.numeric(ydata[splitindexes])-1, file = "ytest", quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+#Writes 100 files to your current directory for BERT
+writerandomnoiseBERT <- function(noisewordsource, rawdata, splitindexes){
+  nresults = c()
+  for(nwords in smallrange){
+    print(nwords)
+    
+    testrawdata = rawdata[splitindexes]
+    
+    for(i in 1:length(testrawdata)){
+      newwords = sample(colnames(noisewordsource), nwords)
+      original = strsplit(testrawdata[i], split = " ")[[1]]
+      
+      newrep = rep("asdf", length(c(newwords, original)))
+      oldwordspos = sort(sample(1:length(newrep), length(original) ))
+      newrep[oldwordspos] = original
+      newrep[setdiff(1:length(newrep), oldwordspos)] = newwords
+      
+      testrawdata[i] = paste(newrep, collapse = " ")
+    }
+    
+    write.table(testrawdata, file = paste("noisyrawdata", nwords, sep = ""), quote = FALSE, col.names = FALSE, row.names = FALSE)
+    
+  }
+}
+
+#Write modified data, for testing
+writerandomnoiseBERT(BOCE.100, rawAGdata, splitindexes)
+#writerandomnoiseBERT(glove.300, rawAGdata, splitindexes)
+
+
+
+
+
+#******
+#In python, run 
+#python3.7 BERT.tf.py 0 0 0 &&  python3.7 BERT.tf.py 0 0 1 &&  python3.7 BERT.tf.py 0 0 2 &&  python3.7 BERT.tf.py 0 1 0 &&  python3.7 BERT.tf.py 0 1 1 &&  python3.7 BERT.tf.py 0 1 2 &&  python3.7 BERT.tf.py 0 2 0 &&  python3.7 BERT.tf.py 0 2 1 &&  python3.7 BERT.tf.py 0 2 2 &&  python3.7 BERT.tf.py 1 0 0 &&  python3.7 BERT.tf.py 1 0 1 &&  python3.7 BERT.tf.py 1 0 2 &&  python3.7 BERT.tf.py 1 1 0 &&  python3.7 BERT.tf.py 1 1 1 &&  python3.7 BERT.tf.py 1 1 2 &&  python3.7 BERT.tf.py 1 2 0 &&  python3.7 BERT.tf.py 1 2 1 &&  python3.7 BERT.tf.py 1 2 2 
+
+#Requirements are at the top of the files
+
+#Output: 
+#tf output:       [noisyrawdata.000.csv ..... noisyrawdata.122.csv]
+#******
+
+
+
+
+
+#another day
+setwd("/home/song/Desktop/Tensorflow/100.nonce.v4/changepoint-nips/eval/bertresults")
+
+
+
+#The correct labels
+ytest = as.factor(as.numeric(ydata[splitindexes])-1)
+#OR reload from file if necessary
+#ytest = as.factor(read.csv("ytest", col.names = FALSE, header = FALSE, stringsAsFactors = FALSE)$FALSE.)
+
+
+
+
+library(caret)
+
+
+
+allfiles = sort(c("BERTresults.tf.000.csv", "BERTresults.tf.020.csv", "BERTresults.tf.110.csv",
+             "BERTresults.tf.001.csv", "BERTresults.tf.021.csv", "BERTresults.tf.111.csv",
+             "BERTresults.tf.002.csv", "BERTresults.tf.022.csv", "BERTresults.tf.112.csv",
+             "BERTresults.tf.010.csv", "BERTresults.tf.100.csv", "BERTresults.tf.120.csv",
+             "BERTresults.tf.011.csv", "BERTresults.tf.101.csv", "BERTresults.tf.121.csv",
+             "BERTresults.tf.012.csv", "BERTresults.tf.102.csv", "BERTresults.tf.122.csv"))
+
+
+
+
+for(j in 1:length(allfiles)){
+  BERTnoiseresults2 = c()
+  alltext = readLines(allfiles[j])
+  for(i in 1:length(alltext)){
+    uv = gsub("\"", "", alltext[i])
+    x1 = strsplit(uv, split="\\|")[[1]]
+    us = confusionMatrix(factor(as.numeric(x1), levels=c("0", "1", "2")), ytest)
+    BERTnoiseresults2[i] = us$overall["Accuracy"]
+  }
+  if(j==1)
+    plot(x=smallrange, y=BERTnoiseresults2, ylab = "Test set accuracy", xlab = "Number of added noise words", ylim = c(0.25,1), type = "l", col="black", cex.lab=1.5)
+  if(j>1)
+    lines(x=smallrange, y=BERTnoiseresults2)
+}
+lines(x=smallrange, y=BOCEnoiseresults[smallrange], col="blue")
+
+
+legend("topright", legend=c("Our method", "BERT(various)"),
+       col=c("blue", "black"), lty=1, lwd = 3, cex=1)
 
 
