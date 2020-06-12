@@ -35,6 +35,7 @@ To reproduce the results, see the evaluation script
 
 ### Results
 #### Unsupervised evaluation: correlation (lower is better) and modularity (higher is better)
+![text](https://github.com/teeshirt-NLP/changepoint/blob/master/modcorrelationresults.png)
 
 |  | Our method | GloVe |
 | --- | --- | --- |
