@@ -254,7 +254,7 @@ par(mar=c(3,4,1,1)+0.1)
 boxplot(s, ylab="Correlation", outline=FALSE)
 
 
-apply(s, MARGIN = 2, FUN = "median") #BOCE pairwise correlations are lower (approx 0)
+apply(s, MARGIN = 2, FUN = "median") #Our pairwise correlations are lower (approx 0)
 
 
 
@@ -362,7 +362,7 @@ glovemodularity = modularityhistogram(Wikitestparagraphs, glove.300)
 
 
 s=matrix(0, ncol = 2, nrow = length(BOCEmodularity))
-colnames(s) = c("BOCE", "GloVe")
+colnames(s) = c("Our method", "GloVe")
 s[,1] = BOCEmodularity
 s[,2] = glovemodularity
 
