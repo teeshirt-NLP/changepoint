@@ -246,7 +246,7 @@ z2 = u2[lower.tri(u2)]
 
 
 s=matrix(0, ncol = 2, nrow = length(z1))
-colnames(s) = c("BOCE", "GloVe")
+colnames(s) = c("Our method", "GloVe")
 s[,1] = z1
 s[,2] = z2
 
@@ -401,7 +401,7 @@ load("xml_data.rData")
 
 rawAGdata = c()
 ydata = c()
-n= 3200# we eventually want 2000 in train and 200 in test
+n= 3200# we eventually want 3000 in train and 200 in test
 i=0
 while(TRUE){
   #xml data arranged as 8*i +offset
