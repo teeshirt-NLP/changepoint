@@ -28,7 +28,7 @@ To reproduce the results, see the evaluation script
 ### How to run the evaluations
 🔶  Note: Read through the evaluation script to change path and file names where appropriate.
 
-1) Download the trained model and process Wikipedia as described above to get the test set
+1) Download the trained model and eval/wikitestdata.csv.zip
 
 
 2) Step through the [evaluation script](https://github.com/teeshirt-NLP/changepoint/blob/master/Scripts/4eval.R).
@@ -39,6 +39,8 @@ To reproduce the results, see the evaluation script
 | --- | --- | --- |
 | Median(IQR) correlations (lower is better) | 0.0070 (0.186) |0.109 (0.133) |
 | Median(IQR) modularity (higher is better) | 0.306 (0.077) | 0.129 (0.033)  |
+
+Below: test set accuracy (higher slope is better)
 
 ![text](https://github.com/teeshirt-NLP/changepoint/blob/master/noiseresults.png)
 

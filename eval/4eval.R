@@ -638,9 +638,6 @@ writerandomnoiseBERT(BOCE.100, rawAGdata, splitindexes)
 
 
 
-#another day
-setwd("/home/song/Desktop/Tensorflow/100.nonce.v4/changepoint-nips/eval/bertresults")
-
 
 
 #The correct labels
