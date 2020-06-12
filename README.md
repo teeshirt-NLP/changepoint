@@ -34,12 +34,12 @@ To reproduce the results, see the evaluation script
 
 
 ### Results
-#### Unsupervised evaluation (correlation and modularity)
+#### Unsupervised evaluation: correlation (lower is better) and modularity (higher is better)
 
 |  | Our method | GloVe |
 | --- | --- | --- |
-| Median(IQR) correlations (lower is better) | 0.0070 (0.186) |0.109 (0.133) |
-| Median(IQR) modularity (higher is better) | 0.306 (0.077) | 0.129 (0.033)  |
+| Median(IQR) correlations | 0.0070 (0.186) |0.109 (0.133) |
+| Median(IQR) modularity | 0.306 (0.077) | 0.129 (0.033)  |
 
 
 #### Supervised evaluation: test set accuracy (higher slope is better)
