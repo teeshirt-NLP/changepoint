@@ -2,7 +2,7 @@
 
 ### Introduction
 
-This code implements the algorithm described in [1]. The authors use a statistical model to learn word embeddings that optimally differentiate between topics.
+This code implements the algorithm described in the [Main Paper](https://github.com/teeshirt-NLP/changepoint/Paper.anon.pdf)[1]. The authors use a statistical model to learn word embeddings that optimally differentiate between topics.
 
 To reproduce the results, see the evaluation script
 
