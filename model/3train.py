@@ -54,8 +54,7 @@ learningrate =  258.41458
 
 
 
-nbatch = int(25.5558)			
-k2 = 2				#Position multiplier
+nbatch = int(25.5558)	
 
 
 #---------------------------------------------------------------------------------------------------------------
@@ -81,98 +80,81 @@ reverse_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
 
 
 
-def by_sentence_vocab(sentences):
-  encoded = []
-  voca = [x.split(" ") for x in sentences]
-  for j in range(len(voca)): 
-    vocb = [x for x in voca[j] if x] #remove empty
-    vocc = []
-    for k in vocb:
-      if k in reverse_dictionary:
-        vocc.append(reverse_dictionary[k])
-    encoded.append(vocc)
-  return encoded
+def encode_sentences(sentences, reverse_dictionary):
+    encoded_sentences = []
+    words_lists = [sentence.split(" ") for sentence in sentences]
+
+    for words in words_lists:
+        non_empty_words = [word for word in words if word]
+        encoded_words = [reverse_dictionary[word] for word in non_empty_words if word in reverse_dictionary]
+        encoded_sentences.append(encoded_words)
+
+    return encoded_sentences
 
 
-def generate_singlet():
-  span = len(paragraphs)
-  target1 = random.randint(0, span - 1) 
-  target2 = random.randint(0, span - 1)
-  while np.abs(target1 - target2)<1:
-    target2 = random.randint(0, span - 1)
-  s1 = paragraphs[target1]
-  s2 = paragraphs[target2]
-  s1 = [x for x in s1 if x]
-  s2 = [x for x in s2 if x]
-  v1 = by_sentence_vocab(s1)
-  v2 = by_sentence_vocab(s2)
-  v1 = [x for x in v1 if len(x)>2]
-  v2 = [x for x in v2 if len(x)>2]
-  if len(v1)>3:
-    v1index = sorted(random.sample(range(len(v1)-3), 1))
-    v1 = [ [v1[i],v1[i+1],v1[i+2]] for i in v1index][0]
-  if len(v2)>3:
-    v2index = sorted(random.sample(range(len(v2)-3), 1))
-    v2 = [ [v2[i],v2[i+1],v2[i+2]] for i in v2index][0]
-  return [v1, v2] #should look like [ v1=[[1,2,3],[4,5,6],[7,8,9]], ... ]
+def generate_single_triplet(paragraphs, reverse_dictionary):
+    span = len(paragraphs)
+    target1, target2 = random.sample(range(span), 2)
+
+    s1, s2 = paragraphs[target1], paragraphs[target2]
+    v1, v2 = encode_sentences(s1, reverse_dictionary), encode_sentences(s2, reverse_dictionary)
+
+    v1, v2 = [x for x in v1 if len(x) > 2], [x for x in v2 if len(x) > 2]
+
+    if len(v1) > 3:
+        v1_index = random.choice(range(len(v1) - 3))
+        v1 = v1[v1_index:v1_index + 3]
+
+    if len(v2) > 3:
+        v2_index = random.choice(range(len(v2) - 3))
+        v2 = v2[v2_index:v2_index + 3]
+
+    return [v1, v2]
 
 
-def generate_singlet_pad():
-  span = len(paragraphs)
-  target1 = random.randint(0, span - 1) 
-  target2 = random.randint(0, span - 1)
-  while np.abs(target1 - target2)<1:
-    target2 = random.randint(0, span - 1)
-  s1 = paragraphs[target1]
-  s2 = paragraphs[target2]
-  s1 = [x for x in s1 if x]
-  s2 = [x for x in s2 if x]
-  v1 = by_sentence_vocab(s1)
-  v2 = by_sentence_vocab(s2)
-  v1 = [x for x in v1 if len(x)>2]
-  v2 = [x for x in v2 if len(x)>2]
-  if len(v1)>2:
-    v1index = sorted(random.sample(range(len(v1)-2), 1))
-    v1 = [ [v1[i],v1[i+1]] for i in v1index][0]
-  if len(v2)>2:
-    v2index = sorted(random.sample(range(len(v2)-2), 1))
-    v2 = [ [v2[i],v2[i+1]] for i in v2index][0]
-  #Padding
-  N=max_nwords 
-  v1 = [a+[int(1e6)] * (N - len(a)) for a in v1]
-  v2 = [a+[int(1e6)] * (N - len(a)) for a in v2]
-  return [v1, v2]
+def generate_single_triplet_padded(paragraphs, reverse_dictionary, max_nwords=50):
+    span = len(paragraphs)
+    target1, target2 = random.sample(range(span), 2)
+
+    s1, s2 = paragraphs[target1], paragraphs[target2]
+    v1, v2 = encode_sentences(s1, reverse_dictionary), encode_sentences(s2, reverse_dictionary)
+
+    v1, v2 = [x for x in v1 if len(x) > 2], [x for x in v2 if len(x) > 2]
+
+    if len(v1) > 2:
+        v1_index = random.choice(range(len(v1) - 2))
+        v1 = v1[v1_index:v1_index + 2]
+
+    if len(v2) > 2:
+        v2_index = random.choice(range(len(v2) - 2))
+        v2 = v2[v2_index:v2_index + 2]
+
+    # Padding
+    padding_value = int(1e6)
+    v1 = [a + [padding_value] * (max_nwords - len(a)) for a in v1]
+    v2 = [a + [padding_value] * (max_nwords - len(a)) for a in v2]
+
+    return [v1, v2]
 
 
-
-def generate_batch(n):
-  s1 = []
-  while True:
-    v = generate_singlet_pad()
-    if len(v[0])>=2 and len(v[1])>=2 and len(v[0][0])==max_nwords and len(v[0][1])==max_nwords and len(v[1][0])==max_nwords and len(v[1][1])==max_nwords:
-      s1.append(v)
-    if len(s1)==n:
-      return [s1]
+def generate_batch(paragraphs, reverse_dictionary, n, max_nwords=50):
+    batch = []
+    while len(batch) < n:
+        triplet = generate_single_triplet_padded(paragraphs, reverse_dictionary, max_nwords)
+        if all(len(sublist) == 2 and len(sublist[0]) == max_nwords and len(sublist[1]) == max_nwords for sublist in triplet):
+            batch.append(triplet)
+    return [batch]
 
 
-def generate_singlet_raw():
-  span = len(paragraphs)
-  target1 = random.randint(0, span - 1) 
-  target2 = random.randint(0, span - 1)
-  while np.abs(target1 - target2)<1:
-    target2 = random.randint(0, span - 1)
-  s1 = paragraphs[target1]
-  s2 = paragraphs[target2]
-  s1 = [x for x in s1 if x]
-  s2 = [x for x in s2 if x]
-  if len(s1)>3:
-    s1index = sorted(random.sample(range(len(s1)-3), 1))
-    s1 = [ [s1[i],s1[i+1],s1[i+2]] for i in s1index][0]
-  if len(s2)>3:
-    s2index = sorted(random.sample(range(len(s2)-3), 1))
-    s2 = [ [s2[i],s2[i+1],s2[i+2]] for i in s2index][0]
-  return [s1, s2]
+def generate_single_triplet_raw(paragraphs):
+    span = len(paragraphs)
+    target1, target2 = random.sample(range(span), 2)
 
+    s1, s2 = paragraphs[target1], paragraphs[target2]
+
+    if len(s1) > 3:
+        s1_index = random.choice(range(len(s1) - 3))
+        s1 = s1
 
 
 
@@ -245,54 +227,39 @@ def run_iteration(package, vardata, tdata, lambdaval, mu0, T0, tnow):
 
 
 
+def calculate_loss(thelist):
+    with tf.name_scope('Initialize_encoding') as scope:
+        reshaped_list = tf.reshape(thelist, (4, max_nwords))
+        bothdata = tf.map_fn(encoder_statistical, reshaped_list, dtype=thedtype)
+        tdata = bothdata[:, :, 0]
+        vardata = bothdata[:, :, 1]
 
-def calculateloss(thelist):
-  #if True:
-  #
-  #
-  with tf.name_scope('Intializeencoding') as scope:
-    thelist2 = tf.reshape(thelist, (4,max_nwords))
-    #s1 = thelist2[0]
-    #
-    bothdata = tf.map_fn(encoder_statistical, thelist2, dtype=thedtype) 
-    tdata = bothdata[:,:,0]
-    vardata = bothdata[:,:,1]
-  #
-  #
-  with tf.name_scope('Intializepriors') as scope:
-    d = tf.cast(embedding_size, thedtype)
-    #
-    mu0 = tf.zeros(shape=[1,d], dtype=thedtype)
-    T0 = priorvariance* tf.ones(shape=[1,d], dtype=thedtype)
-    #
-    lambdaval = tf.constant(10, dtype=thedtype)
-    R0 = tf.reshape(tf.constant(0.0, dtype=thedtype), shape=(1,))
-    muT = mu0
-    TT = T0
-    output0 = [R0, muT, TT]
-  #
-  #
-  with tf.name_scope('RunBOCD') as scope:
-    output1 = run_iteration(output0, vardata, tdata, lambdaval, mu0, T0, 1)
-    output2 = run_iteration(output1, vardata, tdata, lambdaval, mu0, T0, 2)
-    output3 = run_iteration(output2, vardata, tdata, lambdaval, mu0, T0, 3)
-    output4 = run_iteration(output3, vardata, tdata, lambdaval, mu0, T0, 4)
-  #
-  #
-  with tf.name_scope('Finalcalc') as scope:
-    R1 = tf.constant(np.log([.1,.9]), dtype=thedtype) #output1[0]
-    R2 = output2[0]
-    R3 = output3[0]
-    R4 = output4[0]
-    #
-    losselements = [ R1[1], R2[2], R3[1], R4[2] ]
-    loss = tf.math.reduce_sum(tf.math.exp(losselements))
-  return loss
+    with tf.name_scope('Initialize_priors') as scope:
+        d = tf.cast(embedding_size, thedtype)
+        mu0 = tf.zeros(shape=[1, d], dtype=thedtype)
+        T0 = priorvariance * tf.ones(shape=[1, d], dtype=thedtype)
+        lambdaval = tf.constant(10, dtype=thedtype)
+        R0 = tf.reshape(tf.constant(0.0, dtype=thedtype), shape=(1,))
+        muT = mu0
+        TT = T0
+        output0 = [R0, muT, TT]
 
+    with tf.name_scope('Run_BOCD') as scope:
+        output1 = run_iteration(output0, vardata, tdata, lambdaval, mu0, T0, 1)
+        output2 = run_iteration(output1, vardata, tdata, lambdaval, mu0, T0, 2)
+        output3 = run_iteration(output2, vardata, tdata, lambdaval, mu0, T0, 3)
+        output4 = run_iteration(output3, vardata, tdata, lambdaval, mu0, T0, 4)
 
+    with tf.name_scope('Final_calculation') as scope:
+        R1 = tf.constant(np.log([.1, .9]), dtype=thedtype)
+        R2 = output2[0]
+        R3 = output3[0]
+        R4 = output4[0]
 
+        losselements = [R1[1], R2[2], R3[1], R4[2]]
+        loss = tf.math.reduce_sum(tf.math.exp(losselements))
 
-
+    return loss
 
 
 #---------------------------------------------------------------------------------------------------------------
@@ -375,49 +342,58 @@ if testing:
 import time
 import math
 import gc
+import tensorflow as tf
 
+with tf.Session(graph=graph, config=tf.ConfigProto(inter_op_parallelism_threads=nthreads)) as sess:
+    sess.run(tf.global_variables_initializer())
+    
+    old_loss = []
+    mysummarized = []
+    start_time = time.time()
+    
+    for i in range(niter + 1):
+        _, new_loss = sess.run([optimizer, primaryloss])
+        loss_diff = np.abs(np.mean(old_loss[-150:]) - new_loss)
+        old_loss.append(new_loss)
+        runningaverage = np.mean(old_loss[-150:])
+        
+        print(runningaverage, "\t", new_loss, "\t", i % dispinterval)
 
-with tf.Session(graph=graph, config=tf.ConfigProto(inter_op_parallelism_threads=nthreads)) as sess: #
-  sess.run(tf.global_variables_initializer())
-  old_loss = []
-  embed_old = []
-  mysummarized = []
-  start_time = time.time()
-  for i in range(niter+1):
-    _, new_loss  = sess.run([optimizer, primaryloss])
-    #new_loss = new_loss.astype(np.float32) #If runtime error
-    loss_diff = np.abs(np.mean(old_loss[-150:]) - new_loss)
-    old_loss.append(new_loss)
-    runningaverage = np.mean(old_loss[-150:])
-    print(runningaverage, "\t", new_loss, "\t" , i% dispinterval )
-    if math.isnan(new_loss):
-      print('nans')
-      break
-    if i>0 and i % dispinterval ==0:
-      gc.collect()
-      with open('rundetails', 'w') as h:
-        h.write('Currently at {} iterations.'.format(i))
-        h.write('\n\n')
-        q1 = time.time() - start_time
-        h.write('Elapsed time: ' + str(q1))
-        if i >= dispinterval:
-          mysummarized.append(np.mean(old_loss))
-          h.write('\n\n')
-          h.write("Current trace: " +str(mysummarized))
-      save_obj(old_loss, 'lossdetails'+str(i/dispinterval))
-      old_loss = []
-      embed = sess.run([embeddings])
-      save_obj(embed, "final_embeddings"+str(i/dispinterval))
-      del embed
-      gc.collect()
-      varia = sess.run([variances])
-      save_obj(varia, "final_variances"+str(i/dispinterval))
-      del varia
-      gc.collect()
+        if math.isnan(new_loss):
+            print('nans')
+            break
 
+        if i > 0 and i % dispinterval == 0:
+            gc.collect()
 
+            with open('rundetails', 'w') as h:
+                h.write(f'Currently at {i} iterations.\n\n')
+                elapsed_time = time.time() - start_time
+                h.write(f'Elapsed time: {elapsed_time}')
 
-print('Elapsed time: ' + str(q1))
+                if i >= dispinterval:
+                    mysummarized.append(np.mean(old_loss))
+                    h.write('\n\n')
+                    h.write(f"Current trace: {mysummarized}")
+
+            save_obj(old_loss, f'lossdetails{i // dispinterval}')
+            old_loss = []
+
+            embed = sess.run([embeddings])
+            save_obj(embed, f"final_embeddings{i // dispinterval}")
+            del embed
+
+            gc.collect()
+
+            varia = sess.run([variances])
+            save_obj(varia, f"final_variances{i // dispinterval}")
+            del varia
+
+            gc.collect()
+
+elapsed_time = time.time() - start_time
+print(f'Elapsed time: {elapsed_time}')
+
 
 
 
