@@ -1,8 +1,7 @@
-import tensorflow as tf
-
 # Training/display settings
 RUNTIME_SETTINGS = {
-    'data_path': ".",
+    'data_path': "./train_data",
+    'vocab_path': "./vocab_file",
     'save_interval': int(1e6),
     'n_iter': int(1e20),
     'n_threads': 16,
@@ -10,7 +9,6 @@ RUNTIME_SETTINGS = {
 
 # Hyperparameters
 HYPERPARAMS = {
-    'thedtype': tf.float32,    
     'max_nwords': 100,
     'embedding_size': int(100),
     'init_mean': 48.116,

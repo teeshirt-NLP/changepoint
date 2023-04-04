@@ -3,8 +3,8 @@ from tf_utils import calculate_loss
 
 class CAPEmodel:
     def __init__(self, loaded_data, HYPERPARAMS):
-        self.thedtype = HYPERPARAMS['thedtype']
-        self.vocabulary_size = HYPERPARAMS['thedtype']
+        self.thedtype = tf.float32
+        self.vocabulary_size = len(loaded_data.tokenizer)
         self.init_data_variance = HYPERPARAMS['init_data_variance']
         self.embedding_size = HYPERPARAMS['embedding_size']
         self.init_prior_variance = HYPERPARAMS['init_prior_variance']

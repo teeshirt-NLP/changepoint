@@ -1,9 +1,10 @@
 import sys
 import string
-import re
-import pickle
 from collections import Counter
+import pickle
+import re
 
+#TODO: parallelize
 
 def save_obj(obj, name):
     with open(name + '.pkl', 'wb') as f:
@@ -56,8 +57,6 @@ def split_into_sentences(text):
     sentences = [s.translate(str.maketrans('', '', string.punctuation)) for s in sentences] #Remove punctuation...
     return sentences
 
-
-
 def get_counter(batch):
     word_list = [word for paragraph in batch for sentence in paragraph for word in sentence.split()]
     return Counter(word_list)
@@ -75,74 +74,58 @@ def process_lines(lines):
             if "</text>" in line:
                 text = False
 
-            # Replace blockquote tags with newlines
             line = re.sub("&lt;blockquote&gt;", "\n", line)
             line = re.sub("&lt;/blockquote&gt;", "\n", line)
-
-            # Remove XML tags
             line = re.sub("<.*>", "", line)
-
-            # Decode URL encoded characters
             line = re.sub("&amp;", "&", line)
             line = re.sub("&lt;", "<", line)
             line = re.sub("&gt;", ">", line)
-
-            # Remove references
             line = re.sub("<ref[^<]*<\/ref>", "", line)
-
-            # Remove XHTML tags
             line = re.sub("<[^>]*>", "", line)
-
-            # Remove normal URL, preserve visible text
             line = re.sub("\[http:[^] ]*", "[", line)
-
-            # Remove image links, preserve caption
             line = re.sub("\|thumb", "", line, flags=re.IGNORECASE)
             line = re.sub("\|left", "", line, flags=re.IGNORECASE)
             line = re.sub("\|right", "", line, flags=re.IGNORECASE)
             line = re.sub("\|\d+px", "", line, flags=re.IGNORECASE)
             line = re.sub("\[\[image:[^\[\]]*\|", "", line, flags=re.IGNORECASE)
-
-            # Show categories without markup
             line = re.sub("\[\[category:([^|\]]*)[^]]*\]\]", "[[\\1]]", line, flags=re.IGNORECASE)
-
-            # Remove links to other languages
             line = re.sub("\[\[[a-z\-]*:[^\]]*\]\]", "", line)
-
-            # Remove wiki URL, preserve visible text
             line = re.sub("\[\[[^\|\]]*\|", "[[", line)
-
-            # Remove {{icons}} and {tables}
             line = re.sub("{{[^}]*}}", "", line)
             line = re.sub("{[^}]*}", "", line)
-
-            # Remove [ and ]
-            line = re.sub("\[|\]", "", line)
-
-            # Remove URL encoded characters
+            line = re.sub("\[", "", line)
+            line = re.sub("\]", "", line)
             line = re.sub("&[^;]*;", " ", line)
 
-            # Convert to lowercase letters and spaces, spell digits
             line = " " + line + " "
             line = line.lower()
             for i, word in enumerate(["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]):
                 line = line.replace(str(i), f" {word} ")
 
-            # Change non-alphas to single spaces and keep newlines
             line = re.sub("[^a-z.\n]+", " ", line)
-
-            # Remove extra newlines
             line = re.sub("[\n]+", "\n", line)
-
             line = line.rstrip()
 
             yield original_line, line.rstrip() + "\n"
         else:
              yield "", ""
 
+def clean_wikipedia_dump(input_file, output_file):
+    nlines = 0
+    number_of_lines = count_lines(input_file)
+    print("number_of_lines:", number_of_lines)
+    with open(input_file, "r", encoding="utf-8") as infile, open(output_file, "w", encoding="utf-8") as outfile:
+        for original_line, processed_line in process_lines(infile):
+            nlines +=1
+            if nlines % int(number_of_lines/100) ==0:
+                print(round(nlines /number_of_lines,2))
+            #print("ORIG:", original_line)
+            #print("PROCESSED:", processed_line)
+            outfile.write(processed_line)
+            #if nlines > 15000:
+            #    break
 
-
-def process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file):
+def process_cleaned_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file):
     min_words_per_sentence = 4
     min_sentences_per_paragraph = 3
     batch_size = int(5e6)
@@ -151,16 +134,16 @@ def process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file)
     batch_counter = 0
     nlines = 0
     is_test_data = True
-    wordcounts = Counter()
+    totals = Counter()
     number_of_lines = count_lines(input_file)
-    print("number_of_lines:", format(number_of_lines, ".3e"))
+    print("number_of_lines:", number_of_lines)
 
-    with open(input_file, "r", encoding="utf-8") as infile:
-        for _, processed_line in process_lines(infile):
+    with open(input_file) as file_in:
+        for line in file_in:
             nlines +=1
             if nlines % int(number_of_lines/100) ==0:
-                print(str(round(nlines*100 /number_of_lines,2))+"%")
-            sentences = split_into_sentences(processed_line.strip())
+                print(round(nlines /number_of_lines,2))
+            sentences = split_into_sentences(line.strip())
             valid_sentences = [i for i in sentences if len(i.split(" ")) >= min_words_per_sentence]
             if len(valid_sentences) >= min_sentences_per_paragraph:
                 batch.append(valid_sentences)
@@ -173,22 +156,24 @@ def process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file)
                     else:
                         train_file = f"{train_file_prefix}_{int(batch_counter/batch_size)-1}"
                         save_obj(batch, train_file)
-                        wordcounts += get_counter(batch)
+                        totals += get_counter(batch)
                     batch = []
 
     if batch:
         train_file = f"{train_file_prefix}_{int(batch_counter/batch_size)}"
         save_obj(batch, train_file)
-        wordcounts += get_counter(batch)
+        totals += get_counter(batch)
 
-    save_obj(wordcounts.most_common(), vocab_file)
+    save_obj(totals.most_common(), vocab_file)
+
 
 if __name__ == "__main__":
-    if len(sys.argv) == 5:
-        input_file, train_file_prefix, test_file, vocab_file = sys.argv[1:]
-        process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file)
+    if len(sys.argv) == 6:
+        input_file, cleaned_file, train_file_prefix, test_file, vocab_file = sys.argv[1:]
+
+        clean_wikipedia_dump(input_file, cleaned_file)
+        process_cleaned_wikipedia_dump(cleaned_file, train_file_prefix, test_file, vocab_file)
     else:
-        print("Usage: python combined_script.py <input_file-multistream.xml> <train_file_prefix> <test_file> <vocab_file>")
+        print("Usage: python combined_script.py <input_file> <cleaned_file> <train_file> <test_file> <vocab_file>")
         print("Download Wikipedia https://meta.wikimedia.org/wiki/Data_dump_torrents#English_Wikipedia")
         print("Extract it using bzip2 -dk enwiki-YOURDATE-pages-articles-multistream.xml.bz2")
-

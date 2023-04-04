@@ -300,42 +300,6 @@ with graph.as_default():
     primaryloss = tf.reduce_mean(lossvec) #for displaying
 
 
-
-
-
-
-
-testing=False
-#testing=True
-if testing:
-  sess = tf.InteractiveSession(graph=graph, config=tf.ConfigProto(inter_op_parallelism_threads=11))
-  sess.run(tf.global_variables_initializer())
-  thelist = thebatch[0].eval()
-  #
-  #
-  #
-  from tensorflow.python.client import timeline
-  options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-  run_metadata = tf.RunMetadata()
-  _, new_loss  = sess.run([optimizer, primaryloss], options=options, run_metadata=run_metadata)
-  # Create the Timeline object, and write it to a json file
-  fetched_timeline = timeline.Timeline(run_metadata.step_stats)
-  chrome_trace = fetched_timeline.generate_chrome_trace_format()
-  with open('timeline_01_cluster.json', 'w') as f:
-    f.write(chrome_trace)
-  #
-  #
-  #
-  tf_tensorboard_writer = tf.summary.FileWriter('./graphs', sess.graph)
-  tf_tensorboard_writer.close()
-  sess.close()
-  exit()
-
-
-#tensorboard --logdir="./graphs"
-
-
-
 #---------------------------------------------------------------------------------------------------------------
 
 

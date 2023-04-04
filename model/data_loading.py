@@ -5,11 +5,12 @@ from utils import load_obj
 class DataLoader:
     def __init__(self, RUNTIME_SETTINGS):
         self.data_path = RUNTIME_SETTINGS['data_path']
+        self.vocab_path = RUNTIME_SETTINGS['vocab_path']
         self.paragraphs, self.tokenizer, self.detokenizer, self.vocabulary_size = self.load_data()
 
     def load_data(self):
-        paragraphs = load_obj(self.data_path + "/" + "Paragraphdata-training")
-        vocabulary = load_obj(self.data_path + "/" + "BOCE.English.400K.vocab")
+        paragraphs = load_obj(self.data_path)
+        vocabulary = load_obj(self.vocab_path)
         
         detokenizer = dict(enumerate(vocabulary))
         tokenizer = dict(zip(detokenizer.values(), detokenizer.keys()))
