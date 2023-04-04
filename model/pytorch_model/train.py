@@ -22,13 +22,17 @@ class Trainer:
     def train(self, loaded_data):
         n_iter = self.RUNTIME_SETTINGS['n_iter']
         nbatch = self.HYPERPARAMS['nbatch']
+        max_nwords = self.HYPERPARAMS['max_nwords']
+        embedding_size = self.HYPERPARAMS['embedding_size']
+        init_prior_variance = self.HYPERPARAMS['init_prior_variance']
         save_interval = self.RUNTIME_SETTINGS['save_interval']
 
         for i in range(n_iter + 1):
             thebatch = torch.tensor(loaded_data.generate_batch(nbatch), dtype=torch.int64, device=device)
 
             self.optimizer.zero_grad()
-            lossvec = torch.stack([calculate_loss(thebatch[j], self.model.embeddings, self.model.variances) for j in range(nbatch)])
+            lossvec = torch.stack([calculate_loss(thebatch[j], self.model.embeddings, self.model.variances,
+                                                  max_nwords=max_nwords, embedding_size=embedding_size, init_prior_variance=init_prior_variance) for j in range(nbatch)])
             loss = (-lossvec.sum())
             loss.backward()
             self.optimizer.step()

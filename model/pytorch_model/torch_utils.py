@@ -1,9 +1,5 @@
 import torch
 import numpy as np
-from torch import nn
-import gc
-import time
-import pickle
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 thedtype = torch.float32
@@ -58,7 +54,7 @@ def run_iteration(package, vardata, tdata, lambdaval, mu0, T0, tnow):
     return [rb, muT, TT]
 
 
-def calculate_loss(thelist, embeddings, variances, max_nwords=100, embedding_size=100, priorvariance=1):
+def calculate_loss(thelist, embeddings, variances, max_nwords=100, embedding_size=100, init_prior_variance=1):
     reshaped_list = thelist.view(4, max_nwords)
     bothdata = torch.stack([encoder_statistical(reshaped_list[i], embeddings, variances) for i in range(4)], dim=0)
     tdata = bothdata[:, :, 0]
@@ -66,7 +62,7 @@ def calculate_loss(thelist, embeddings, variances, max_nwords=100, embedding_siz
 
     #d = torch.tensor(embedding_size, dtype=thedtype, device=device)
     mu0 = torch.zeros(1, embedding_size, dtype=thedtype, device=device)
-    T0 = priorvariance * torch.ones(1, embedding_size, dtype=thedtype, device=device)
+    T0 = init_prior_variance * torch.ones(1, embedding_size, dtype=thedtype, device=device)
     lambdaval = torch.tensor(10, dtype=thedtype, device=device)
     R0 = torch.tensor(0.0, dtype=thedtype, device=device).unsqueeze(0)
     muT = mu0
