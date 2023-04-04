@@ -1,2 +1,4 @@
 .DS*
 train/.DS*
+model/.idea
+model/.conda
