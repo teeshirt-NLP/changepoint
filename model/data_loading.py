@@ -1,20 +1,19 @@
 import random
-from utils import load_obj
+from pytorch_model import load_obj
 
 
 class DataLoader:
-    def __init__(self, RUNTIME_SETTINGS):
-        self.data_path = RUNTIME_SETTINGS['data_path']
-        self.vocab_path = RUNTIME_SETTINGS['vocab_path']
-        self.paragraphs, self.tokenizer, self.detokenizer, self.vocabulary_size = self.load_data()
+    def __init__(self, RUNTIME_SETTINGS, HYPERPARAMS):
+        self.paragraphs, self.tokenizer, self.detokenizer = self.load_data(RUNTIME_SETTINGS, HYPERPARAMS)
 
-    def load_data(self):
-        paragraphs = load_obj(self.data_path)
-        vocabulary = load_obj(self.vocab_path)
+    def load_data(self, RUNTIME_SETTINGS, HYPERPARAMS):
+        paragraphs = load_obj(RUNTIME_SETTINGS['data_path'])
+        vocabulary_with_counts = load_obj(RUNTIME_SETTINGS['vocab_path'])
+        vocabulary = [item[0] for item in vocabulary_with_counts[:HYPERPARAMS['vocabulary_size']]]
         
         detokenizer = dict(enumerate(vocabulary))
         tokenizer = dict(zip(detokenizer.values(), detokenizer.keys()))
-        return paragraphs, tokenizer, detokenizer, len(vocabulary)
+        return paragraphs, tokenizer, detokenizer
 
     def encode_sentences(self, sentences):
         encoded_sentences = []
@@ -78,7 +77,7 @@ class DataLoader:
             doublet = self.generate_single_doublet_padded(max_nwords)
             if all(len(sublist) == 2 and len(sublist[0]) == max_nwords and len(sublist[1]) == max_nwords for sublist in doublet):
                 batch.append(doublet)
-        return [batch]
+        return batch
 
 
     def generate_single_doublet_raw(self):

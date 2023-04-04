@@ -3,7 +3,7 @@ import string
 import re
 import pickle
 from collections import Counter
-
+import gc
 
 def save_obj(obj, name):
     with open(name + '.pkl', 'wb') as f:
@@ -175,6 +175,7 @@ def process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file)
                         save_obj(batch, train_file)
                         wordcounts += get_counter(batch)
                     batch = []
+                    gc.collect()
 
     if batch:
         train_file = f"{train_file_prefix}_{int(batch_counter/batch_size)}"
@@ -182,6 +183,7 @@ def process_wikipedia_dump(input_file, train_file_prefix, test_file, vocab_file)
         wordcounts += get_counter(batch)
 
     save_obj(wordcounts.most_common(), vocab_file)
+    gc.collect()
 
 if __name__ == "__main__":
     if len(sys.argv) == 5:

@@ -1,21 +1,18 @@
-from model import CAPEmodel
-from train import Trainer
-from config import RUNTIME_SETTINGS, HYPERPARAMS
-
 from data_loading import DataLoader
+from pytorch_model import CAPEmodel, Trainer, RUNTIME_SETTINGS, HYPERPARAMS
 
 def main():    
     # Load the data
-    loaded_data = DataLoader(RUNTIME_SETTINGS)
+    loaded_data = DataLoader(RUNTIME_SETTINGS, HYPERPARAMS)
 
     # Initialize the model
-    model = CAPEmodel(loaded_data, HYPERPARAMS)
+    model = CAPEmodel(HYPERPARAMS)
 
     # Initialize the trainer
-    trainer = Trainer(model, RUNTIME_SETTINGS)
+    trainer = Trainer(model, RUNTIME_SETTINGS, HYPERPARAMS)
 
     # Train the model
-    trainer.train()
+    trainer.train(loaded_data)
 
 
 if __name__ == "__main__":
