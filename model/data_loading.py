@@ -78,7 +78,7 @@ class DataLoader:
             doublet = self.generate_single_doublet_padded(max_nwords)
             if all(len(sublist) == 2 and len(sublist[0]) == max_nwords and len(sublist[1]) == max_nwords for sublist in doublet):
                 batch.append(doublet)
-        return batch
+        return [batch]
 
 
     def generate_single_doublet_raw(self):

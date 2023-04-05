@@ -17,9 +17,6 @@ class CAPEmodel:
 
         self.loaded_data = loaded_data
 
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self._build_model()
 
     def _build_model(self):
         with tf.name_scope('Dataset') as scope:
@@ -55,7 +52,6 @@ class CAPEmodel:
         return tf.stack([tdata, vardata], axis=1)
 
     def calculate_loss(self, thelist):
-        embedding_size = tf.shape(self.embeddings)[0]
         with tf.name_scope('Initialize_encoding') as scope:
             reshaped_list = tf.reshape(thelist, (4, self.max_nwords))
             bothdata = tf.map_fn(self.encoder_statistical, reshaped_list, dtype=self.thedtype)
@@ -63,7 +59,7 @@ class CAPEmodel:
             vardata = bothdata[:, :, 1]
 
         with tf.name_scope('Initialize_priors') as scope:
-            d = tf.cast(embedding_size, self.thedtype)
+            d = tf.cast(self.embedding_size, self.thedtype)
             mu0 = tf.zeros(shape=[1, d], dtype=self.thedtype)
             T0 = self.priorvariance * tf.ones(shape=[1, d], dtype=self.thedtype)
             lambdaval = tf.constant(10, dtype=self.thedtype)

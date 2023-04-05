@@ -12,10 +12,18 @@ class Trainer:
         self.n_iter = RUNTIME_SETTINGS['n_iter']
         self.n_threads = RUNTIME_SETTINGS['n_threads']
         self.save_interval = RUNTIME_SETTINGS['save_interval']
-        
-        self.sess = tf.Session(graph=self.model.graph, config=tf.ConfigProto(inter_op_parallelism_threads=self.n_threads))
-        self.sess.run(tf.global_variables_initializer())
-        
+
+
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            self.model._build_model()
+
+        self.sess = tf.Session(graph=self.graph,
+                               config=tf.ConfigProto(inter_op_parallelism_threads=self.n_threads))
+        with self.sess.as_default():
+            with self.graph.as_default():
+                self.sess.run(tf.global_variables_initializer())
+
     def train(self):
         old_loss = []
         mysummarized = []
