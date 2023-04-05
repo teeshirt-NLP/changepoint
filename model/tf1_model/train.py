@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from utils import save_obj
+from .utils import save_obj
 import time
 import math
 import gc

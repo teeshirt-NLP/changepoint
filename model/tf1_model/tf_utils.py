@@ -14,16 +14,6 @@ def constant_hazard(lambdaval, t, thedtype=tf.float32): #t works as a normal int
   return tf.zeros(shape=[t], dtype=thedtype) + tf.cast(1/lambdaval, thedtype)
 
 
-def encoder_statistical(s1, embeddings, variances, thedtype=tf.float32):
-  z = unPad(s1)
-  embed1 = tf.nn.embedding_lookup(embeddings, z)
-  tdata = tf.reduce_mean(embed1, axis=0)
-
-  var1 = tf.math.abs( tf.nn.embedding_lookup(variances, z) )
-  vardata = tf.reduce_sum(var1, axis=0)/tf.square( tf.cast(tf.shape(var1)[0], dtype=thedtype) ) 
-  return tf.stack([tdata, vardata], axis=1)
-
-
 def updateRvector(R, predprobs, lambdaval, tnow):
   H = constant_hazard(lambdaval, tnow)
   growthprobs = R + predprobs + tf.math.log(1-H)

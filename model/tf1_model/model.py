@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tf_utils import encoder_statistical, run_iteration
+from .tf_utils import unPad, run_iteration
 import numpy as np
 
 
@@ -45,11 +45,20 @@ class CAPEmodel:
             self.optimizer = tf.train.AdagradOptimizer(self.learning_rate).minimize(-1*tf.reduce_sum(lossvec))
             self.primaryloss = tf.reduce_mean(lossvec)
 
+    def encoder_statistical(self, s1):
+        z = unPad(s1)
+        embed1 = tf.nn.embedding_lookup(self.embeddings, z)
+        tdata = tf.reduce_mean(embed1, axis=0)
+
+        var1 = tf.math.abs(tf.nn.embedding_lookup(self.variances, z))
+        vardata = tf.reduce_sum(var1, axis=0) / tf.square(tf.cast(tf.shape(var1)[0], dtype=self.thedtype))
+        return tf.stack([tdata, vardata], axis=1)
+
     def calculate_loss(self, thelist):
         embedding_size = tf.shape(self.embeddings)[0]
         with tf.name_scope('Initialize_encoding') as scope:
             reshaped_list = tf.reshape(thelist, (4, self.max_nwords))
-            bothdata = tf.map_fn(encoder_statistical, reshaped_list, self.embeddings, self.variances, dtype=self.thedtype)
+            bothdata = tf.map_fn(self.encoder_statistical, reshaped_list, dtype=self.thedtype)
             tdata = bothdata[:, :, 0]
             vardata = bothdata[:, :, 1]
 
