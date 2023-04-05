@@ -60,7 +60,6 @@ def calculate_loss(thelist, embeddings, variances, max_nwords=100, embedding_siz
     tdata = bothdata[:, :, 0]
     vardata = bothdata[:, :, 1]
 
-    #d = torch.tensor(embedding_size, dtype=thedtype, device=device)
     mu0 = torch.zeros(1, embedding_size, dtype=thedtype, device=device)
     T0 = init_prior_variance * torch.ones(1, embedding_size, dtype=thedtype, device=device)
     lambdaval = torch.tensor(10, dtype=thedtype, device=device)

@@ -30,7 +30,7 @@ class Trainer:
         print("Starting training")
 
         for i in range(n_iter + 1):
-            thebatch = torch.tensor(loaded_data.generate_batch(nbatch), dtype=torch.int64, device=device)
+            thebatch = torch.tensor(loaded_data.generate_batch(nbatch)[0], dtype=torch.int64, device=device)
 
             self.optimizer.zero_grad()
             lossvec = torch.stack([calculate_loss(thebatch[j], self.model.embeddings, self.model.variances,
