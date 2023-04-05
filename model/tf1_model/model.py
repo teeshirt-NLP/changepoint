@@ -21,7 +21,7 @@ class CAPEmodel:
 
     def _build_model(self):
         with tf.name_scope('Dataset') as scope:
-            dataset = tf.data.Dataset.from_generator(self.data_loader.generate_batch, args=[self.nbatch], output_types=(tf.int32), output_shapes=(self.nbatch,2,2,self.max_nwords) )
+            dataset = tf.data.Dataset.from_generator(self.data_loader.generate_batch, args=[self.nbatch], output_types=tf.int32, output_shapes=(self.nbatch,2,2,self.max_nwords) )
             dataset = dataset.repeat().prefetch(tf.data.experimental.AUTOTUNE)
             iterator = dataset.make_one_shot_iterator()
             thebatch = iterator.get_next()

@@ -5,6 +5,7 @@ from pytorch_model import load_obj
 class DataLoader:
     def __init__(self, RUNTIME_SETTINGS, HYPERPARAMS):
         self.paragraphs, self.tokenizer, self.detokenizer = self.load_data(RUNTIME_SETTINGS, HYPERPARAMS)
+        print("Data loaded")
 
     def load_data(self, RUNTIME_SETTINGS, HYPERPARAMS):
         paragraphs = load_obj(RUNTIME_SETTINGS['data_path'])

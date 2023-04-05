@@ -9,23 +9,25 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 thedtype = torch.float32
 
 class Trainer:
-    def __init__(self, model, RUNTIME_SETTINGS, HYPERPARAMS):
+    def __init__(self, model, RUNTIME_SETTINGS):
         self.model = model
-        learning_rate = HYPERPARAMS['learning_rate']
+        learning_rate = self.model.HYPERPARAMS['learning_rate']
         self.optimizer = torch.optim.Adagrad(model.get_params(), lr=learning_rate)
         self.primaryloss = []
         self.mysummarized = []
         self.start_time = time.time()
         self.RUNTIME_SETTINGS = RUNTIME_SETTINGS
-        self.HYPERPARAMS = HYPERPARAMS
+        print("Trainer initialized")
 
     def train(self, loaded_data):
         n_iter = self.RUNTIME_SETTINGS['n_iter']
-        nbatch = self.HYPERPARAMS['nbatch']
-        max_nwords = self.HYPERPARAMS['max_nwords']
-        embedding_size = self.HYPERPARAMS['embedding_size']
-        init_prior_variance = self.HYPERPARAMS['init_prior_variance']
+        nbatch = self.model.HYPERPARAMS['nbatch']
+        max_nwords = self.model.HYPERPARAMS['max_nwords']
+        embedding_size = self.model.HYPERPARAMS['embedding_size']
+        init_prior_variance = self.model.HYPERPARAMS['init_prior_variance']
         save_interval = self.RUNTIME_SETTINGS['save_interval']
+
+        print("Starting training")
 
         for i in range(n_iter + 1):
             thebatch = torch.tensor(loaded_data.generate_batch(nbatch), dtype=torch.int64, device=device)

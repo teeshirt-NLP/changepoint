@@ -11,7 +11,7 @@ RUNTIME_SETTINGS = {
 HYPERPARAMS = {
     'max_nwords': 100,
     'vocabulary_size': int(4e5),
-    'embedding_size': int(100),
+    'embedding_size': int(20),
     'init_mean': 48.116,
     'init_data_variance': 573.9727,
     'init_prior_variance': 2.86002,

@@ -9,7 +9,7 @@ def main():
     model = CAPEmodel(HYPERPARAMS)
 
     # Initialize the trainer
-    trainer = Trainer(model, RUNTIME_SETTINGS, HYPERPARAMS)
+    trainer = Trainer(model, RUNTIME_SETTINGS)
 
     # Train the model
     trainer.train(loaded_data)
