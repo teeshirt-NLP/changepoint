@@ -1,0 +1,9 @@
+.DS*
+train/.DS*
+model/.idea
+model/.conda
+model/data
+model/__pycache__
+model/pytorch_model/__pycache__
+model/tf1_model/__pycache__
+.idea
