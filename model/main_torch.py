@@ -1,5 +1,6 @@
 from data_loading import DataLoader
-from pytorch_model import CAPEmodel, Trainer, RUNTIME_SETTINGS, HYPERPARAMS
+from pytorch_model import CAPEmodel, Trainer
+from .config import RUNTIME_SETTINGS, HYPERPARAMS
 
 def main():    
     # Load the data

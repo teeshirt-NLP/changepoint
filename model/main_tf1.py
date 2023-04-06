@@ -1,5 +1,6 @@
 from data_loading import DataLoader
-from tf1_model import CAPEmodel, Trainer, RUNTIME_SETTINGS, HYPERPARAMS
+from tf1_model import CAPEmodel, Trainer
+from config import RUNTIME_SETTINGS, HYPERPARAMS
 
 def main():    
     # Load the data
